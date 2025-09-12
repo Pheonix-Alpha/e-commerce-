@@ -1,11 +1,12 @@
+import "./config.js";
 import express from "express";
+
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+
 import authRouter from "./routes/auth.routes.js";
 import passport from "passport";
 import "./passport.js";
-
-dotenv.config();
+import session from "express-session";
 
 const app = express();
 
