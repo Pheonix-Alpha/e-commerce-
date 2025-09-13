@@ -25,9 +25,11 @@ router.get(
      const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
     // Redirect to frontend route with token in query (demo-friendly)
-    const redirectUrl = `${process.env.FRONTEND_URL}/oauth-success?token=${encodeURIComponent(token)}`;
+   const redirectUrl = `${process.env.FRONTEND_URL}/oauth-success?token=${encodeURIComponent(
+      token
+    )}&name=${encodeURIComponent(req.user.name)}&email=${encodeURIComponent(req.user.email)}`;
+
     return res.redirect(redirectUrl);
-    res.json({ msg: "Google Auth Success", user: req.user });
   }
 );
 
