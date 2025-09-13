@@ -17,21 +17,38 @@ router.get(
 );
 
 router.get(
-    "/google/callback",
-    passport.authenticate("google",{failureRedirect:  process.env.FRONTEND_URL + "/login"}),
-     (req, res) => {
-    // Successful login
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: process.env.FRONTEND_URL + "/login",
+    session: false, // 🚀 important if not using express-session
+  }),
+  (req, res) => {
+    try {
+      console.log("✅ Google User:", req.user);
 
-     const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+      if (!req.user) {
+        return res.status(400).json({ error: "Google authentication failed" });
+      }
 
-    // Redirect to frontend route with token in query (demo-friendly)
-   const redirectUrl = `${process.env.FRONTEND_URL}/oauth-success?token=${encodeURIComponent(
-      token
-    )}&name=${encodeURIComponent(req.user.name)}&email=${encodeURIComponent(req.user.email)}`;
+      const token = jwt.sign(
+        { id: req.user._id },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
 
-    return res.redirect(redirectUrl);
+      const redirectUrl = `${process.env.FRONTEND_URL}/oauth-success?token=${encodeURIComponent(
+        token
+      )}&name=${encodeURIComponent(req.user.name)}&email=${encodeURIComponent(req.user.email)}`;
+
+      console.log("➡️ Redirecting to:", redirectUrl);
+      return res.redirect(redirectUrl);
+    } catch (err) {
+      console.error("🔥 Google Callback Error:", err);
+      return res.status(500).json({ error: err.message });
+    }
   }
 );
+
 
 
 
