@@ -18,9 +18,15 @@ router.get(
 
 router.get(
     "/google/callback",
-    passport.authenticate("google",{failureRedirect: "/login"}),
+    passport.authenticate("google",{failureRedirect:  process.env.FRONTEND_URL + "/login"}),
      (req, res) => {
     // Successful login
+
+     const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+    // Redirect to frontend route with token in query (demo-friendly)
+    const redirectUrl = `${process.env.FRONTEND_URL}/oauth-success?token=${encodeURIComponent(token)}`;
+    return res.redirect(redirectUrl);
     res.json({ msg: "Google Auth Success", user: req.user });
   }
 );
